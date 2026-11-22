@@ -205,10 +205,6 @@ const createStyles = (theme: AppTheme) =>
       flex: 1,
       backgroundColor: theme.colors.background,
     },
-    scrollContent: {
-      flexGrow: 1,
-      paddingBottom: theme.spacing.xl,
-    },
     headerBanner: {
       height: 200,
       backgroundColor: theme.colors.primary,
@@ -275,16 +271,6 @@ const createStyles = (theme: AppTheme) =>
       paddingHorizontal: theme.spacing.md,
       fontSize: 15,
       color: theme.colors.text,
-    },
-    forgotPasswordButton: {
-      alignSelf: "flex-end",
-      marginTop: 2,
-      marginBottom: theme.spacing.lg,
-    },
-    forgotPasswordText: {
-      fontSize: 14,
-      fontWeight: "600",
-      color: theme.colors.primary,
     },
     errorText: {
       fontSize: 13,
@@ -358,21 +344,6 @@ const createStyles = (theme: AppTheme) =>
       fontSize: 12.5,
       fontWeight: "500",
       color: "#E0E7FF",
-    },
-    footerRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      marginTop: theme.spacing.lg,
-    },
-    footerText: {
-      fontSize: 14,
-      color: theme.colors.textSecondary,
-    },
-    createAccountText: {
-      fontSize: 14,
-      fontWeight: "600",
-      color: theme.colors.primary,
     },
     pressed: {
       opacity: 0.85,

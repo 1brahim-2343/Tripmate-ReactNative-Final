@@ -417,7 +417,7 @@ export async function fetchDestinations(): Promise<Destination[]> {
 export async function fetchDestinationById(
   id: string,
 ): Promise<Destination | null> {
-  // 1. Reuse already-loaded destination from memory if available (0 new requests!)
+  // If already in memory simply use it
   if (alreadyFetchedDestinations) {
     const existing = alreadyFetchedDestinations.find(
       (item) => item.id.toLowerCase() === id.toLowerCase(),
@@ -425,7 +425,7 @@ export async function fetchDestinationById(
     if (existing) return existing;
   }
 
-  // 2. Otherwise build from DEFAULT_DESTINATIONS if it wasn't loaded yet
+  // If no, build from DEFAULT_DESTINATIONS
   const baseDestination = FEATURED_DEFAULT_DESTINATIONS.find(
     (item) => item.id.toLowerCase() === id.toLowerCase(),
   );
@@ -433,16 +433,80 @@ export async function fetchDestinationById(
     return buildUserReadyDestination(baseDestination);
   }
 
-  // 3. Fallback for custom searched cities
-  const searched = await searchCitiesRemote(id);
-  return searched[0] ?? null;
+  //if input is custom cities
+  const cityName = id.split("__")[0];
+  const searched = await searchCitiesRemote(cityName);
+  return searched.find((item) => item.id === id) ?? searched[0] ?? null;
 }
 
+// export async function searchCitiesRemote(
+//   query: string,
+// ): Promise<Destination[]> {
+//   const trimmed = query.trim();
+//   if (trimmed.length < 2) return [];
+
+//   const url = `${GEOCODING_BASE_URL}?name=${encodeURIComponent(
+//     trimmed,
+//   )}&count=5&language=en&format=json`;
+
+//   const response = await fetch(url);
+//   if (!response.ok) {
+//     throw new Error("Failed to search cities");
+//   }
+
+//   const data = await response.json();
+//   const results: any[] = data.results ?? [];
+
+//   return Promise.all(
+//     results.map(async (item): Promise<Destination> => {
+//       const countryCode: string = item.country_code ?? "UN";
+//       const [wiki, weather] = await Promise.all([
+//         fetchWikipediaSummary(item.name),
+//         fetchDestinationWeather(item.latitude, item.longitude),
+//       ]);
+//       console.log(item);
+
+//       return {
+//         id: `${String(item.name).toLowerCase()}__${item.id}`, // e.g. "baku__1111"
+//         name: item.name,
+//         country: item.country ?? countryCode,
+//         countryCode,
+//         flagUrl: getFlagUrl(countryCode),
+//         category: "Cities",
+//         rating: undefined,
+//         reviewsCount: undefined,
+//         description:
+//           wiki.extract ??
+//           `Explore ${item.name}, a popular destination in ${
+//             item.country ?? ""
+//           }.`,
+//         imageUrl:
+//           wiki.imageUrl ??
+//           "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80",
+//         latitude: item.latitude,
+//         longitude: item.longitude,
+//         highlights: [],
+//         weather,
+//       };
+//     }),
+//   );
+// }
 export async function searchCitiesRemote(
   query: string,
 ): Promise<Destination[]> {
   const trimmed = query.trim();
   if (trimmed.length < 2) return [];
+
+  const lowerQuery = trimmed.toLowerCase();
+
+  const allFeatured = await fetchDestinations();
+  const localMatches = allFeatured.filter(
+    (d) =>
+      d.name.toLowerCase().includes(lowerQuery) ||
+      d.country.toLowerCase().includes(lowerQuery),
+  );
+
+  const seenIds = new Set<string>(localMatches.map((d) => d.id));
 
   const url = `${GEOCODING_BASE_URL}?name=${encodeURIComponent(
     trimmed,
@@ -456,8 +520,18 @@ export async function searchCitiesRemote(
   const data = await response.json();
   const results: any[] = data.results ?? [];
 
-  return Promise.all(
-    results.map(async (item): Promise<Destination> => {
+  // Combine dublicate results
+  const uniqueRemoteItems = results.filter((item) => {
+    const id = String(item.name).toLowerCase().replace(/\s+/g, "-");
+    if (seenIds.has(id)) {
+      return false;
+    }
+    seenIds.add(id);
+    return true;
+  });
+
+  const remoteDestinations = await Promise.all(
+    uniqueRemoteItems.map(async (item): Promise<Destination> => {
       const countryCode: string = item.country_code ?? "UN";
       const [wiki, weather] = await Promise.all([
         fetchWikipediaSummary(item.name),
@@ -471,8 +545,6 @@ export async function searchCitiesRemote(
         countryCode,
         flagUrl: getFlagUrl(countryCode),
         category: "Cities",
-        rating: undefined,
-        reviewsCount: undefined,
         description:
           wiki.extract ??
           `Explore ${item.name}, a popular destination in ${
@@ -488,4 +560,6 @@ export async function searchCitiesRemote(
       };
     }),
   );
+
+  return [...localMatches, ...remoteDestinations];
 }

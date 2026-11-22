@@ -17,8 +17,8 @@ export interface Destination {
   id: string;
   name: string;
   country: string;
-  countryCode: string; // e.g. "PT", "JP", "CH"
-  flagUrl: string; // e.g. "https://flagcdn.com/w80/jp.png"
+  countryCode: string;
+  flagUrl: string;
   category: Exclude<CategoryFilter, "All">;
   rating?: number;
   reviewsCount?: string;

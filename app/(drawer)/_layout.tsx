@@ -1,5 +1,5 @@
 import { Drawer } from "expo-router/drawer";
-import Ionicons from "@react-native-vector-icons/ionicons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useTheme } from "../../src/contexts/ThemeContext";
 import { Pressable } from "react-native";
 
@@ -41,7 +41,11 @@ export default function DrawerLayout() {
         options={{
           title: "Explore & Trips",
           drawerIcon: ({ color, size }) => (
-            <Ionicons name="compass-outline" size={size} color={color} />
+            <Ionicons
+              name="compass-outline"
+              size={size}
+              color={theme.colors.text}
+            />
           ),
         }}
       />
@@ -50,8 +54,12 @@ export default function DrawerLayout() {
         options={{
           title: "Travel Journal",
           headerShown: true,
-          drawerIcon: ({ color, size }) => (
-            <Ionicons name="book-outline" size={size} color={color} />
+          drawerIcon: ({ size }) => (
+            <Ionicons
+              name="book-outline"
+              size={size}
+              color={theme.colors.text}
+            />
           ),
         }}
       />
@@ -60,8 +68,8 @@ export default function DrawerLayout() {
         options={{
           title: "Settings",
           headerShown: true,
-          drawerIcon: ({ color, size }) => (
-            <Ionicons name="settings-outline" size={size} color={color} />
+          drawerIcon: ({ size }) => (
+            <Ionicons name="settings-outline" size={size} color={theme.colors.text} />
           ),
         }}
       />

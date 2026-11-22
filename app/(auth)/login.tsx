@@ -150,7 +150,7 @@ export default function LoginScreen() {
           {error && <Text style={styles.errorText}>{error}</Text>}
 
           <Pressable
-            onPress={handleLogin}
+            onPress={handleValidation}
             style={({ pressed }) => [
               styles.signInButton,
               pressed && styles.pressed,

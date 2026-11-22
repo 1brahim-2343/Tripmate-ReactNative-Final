@@ -7,7 +7,7 @@ let dbPromise: Promise<SQLite.SQLiteDatabase> | null = null;
 export function getDatabase(): Promise<SQLite.SQLiteDatabase> {
   if (!dbPromise) {
     dbPromise = (async () => {
-      const db = await SQLite.openDatabaseSync(DATABASE_NAME);
+      const db = await SQLite.openDatabaseAsync(DATABASE_NAME);
 
       await db.execAsync(`
         PRAGMA journal_mode = WAL;

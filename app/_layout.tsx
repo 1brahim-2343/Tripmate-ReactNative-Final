@@ -85,7 +85,7 @@ function RootNavigator() {
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="(drawer)" />
         <Stack.Screen name="destination/[id]" />
-        <Stack.Screen name="trip/add" options={{ presentation: "modal" }} />
+        <Stack.Screen name="trip/create" options={{ presentation: "modal" }} />
         <Stack.Screen name="trip/[id]/index" />
         <Stack.Screen name="trip/[id]/edit" />
         <Stack.Screen name="trip/[id]/itinerary" />

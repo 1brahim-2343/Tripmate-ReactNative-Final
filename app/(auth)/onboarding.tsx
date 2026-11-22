@@ -130,7 +130,7 @@ export default function OnboardingScreen() {
         )}
       />
 
-      {/* Footer(Dots & button) */}
+      {/*Dots & button*/}
       <View style={styles.footer}>
         <View style={styles.dotsContainer}>
           {SLIDES.map((slide, index) => {
@@ -147,22 +147,21 @@ export default function OnboardingScreen() {
           })}
         </View>
 
-        {isLastSlide && (
-          <Pressable
-            onPress={completeOnboarding}
-            style={({ pressed }) => [
-              styles.primaryButton,
-              pressed && styles.pressed,
-            ]}
-          >
-            <Text style={styles.primaryButtonText}>Get Started</Text>
-            <Ionicons
-              name={isLastSlide ? "checkmark-circle-outline" : "arrow-forward"}
-              size={20}
-              color={theme.colors.surface}
-            />
-          </Pressable>
-        )}
+        <Pressable
+          onPress={completeOnboarding}
+          style={({ pressed }) => [
+            isLastSlide && styles.primaryButton,
+            pressed && styles.pressed,
+            !isLastSlide && styles.invisible,
+          ]}
+        >
+          <Text style={styles.primaryButtonText}>Get Started</Text>
+          <Ionicons
+            name={isLastSlide ? "checkmark-circle-outline" : "arrow-forward"}
+            size={20}
+            color={theme.colors.surface}
+          />
+        </Pressable>
       </View>
     </SafeAreaView>
   );
@@ -173,6 +172,10 @@ const createStyles = (theme: AppTheme) =>
     container: {
       flex: 1,
       backgroundColor: theme.colors.background,
+    },
+    invisible: {
+      opacity: 0,
+      height: 54,
     },
     topBar: {
       flexDirection: "row",

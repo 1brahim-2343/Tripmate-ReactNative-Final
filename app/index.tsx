@@ -13,7 +13,7 @@ export default function Index() {
   );
   useEffect(() => {
     (async () => {
-      await storage.resetIsOnboarding(); // temporary test reset
+      // await storage.resetIsOnboarding(); // temporary test reset
       const done = await storage.isOnboardingDone();
       setIsOnboardingDone(done);
     })();

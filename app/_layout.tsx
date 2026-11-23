@@ -86,14 +86,13 @@ function RootNavigator() {
         <Stack.Screen name="(drawer)" />
         <Stack.Screen name="destination/[id]" />
         <Stack.Screen name="trip/create" options={{ presentation: "modal" }} />
-        <Stack.Screen name="trip/[id]/index" />
+        <Stack.Screen name="trip/[id]/index" options={{presentation: 'modal'}} />
         <Stack.Screen name="trip/[id]/edit" />
-        <Stack.Screen name="trip/[id]/itinerary" />
+        <Stack.Screen name="trip/[id]/itinerary"  options={{presentation: 'modal'}}/>
         <Stack.Screen
           name="trip/[id]/activity"
           options={{ presentation: "modal" }}
         />
-        <Stack.Screen name="trip/[id]/expenses" />
         <Stack.Screen name="trip/[id]/photos" />
         <Stack.Screen name="+not-found" />
       </Stack>

@@ -18,6 +18,7 @@ type AuthContextValue = {
   isAuthenticated: boolean;
   isLoading: boolean;
   userEmail: string | null;
+  userName: string | null;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
 };
@@ -28,6 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
 
   useEffect(() => {
     storage.getToken().then((token) => {
@@ -49,6 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await storage.saveToken(DEMO_USER.token);
     setIsAuthenticated(true);
     setUserEmail(DEMO_USER.email);
+    setUserName(DEMO_USER.name);
     return true;
   };
   const logout = async () => {
@@ -58,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, isLoading, userEmail, login, logout }}
+      value={{ isAuthenticated, isLoading, userEmail, login, logout, userName }}
     >
       {children}
     </AuthContext.Provider>

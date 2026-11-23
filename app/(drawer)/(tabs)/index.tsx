@@ -317,7 +317,7 @@ export default function HomeScreen() {
                         <Ionicons
                           name="location"
                           size={13}
-                          color={theme.colors.surface}
+                          color='#dedddd'
                         />
                         <Text numberOfLines={1} style={styles.cardCountryText}>
                           {item.country}
@@ -510,7 +510,7 @@ const createStyles = (theme: AppTheme) =>
     flagCodeText: {
       fontSize: 11,
       fontWeight: "700",
-      color: theme.colors.surface,
+      color: '#fff',
     },
     weatherBadge: {
       flexDirection: "row",
@@ -524,7 +524,7 @@ const createStyles = (theme: AppTheme) =>
     weatherText: {
       fontSize: 11,
       fontWeight: "700",
-      color: theme.colors.surface,
+      color: '#fff',
     },
     cardGradient: {
       paddingHorizontal: 16,
@@ -536,7 +536,7 @@ const createStyles = (theme: AppTheme) =>
     cardTitle: {
       fontSize: 22,
       fontWeight: "800",
-      color: theme.colors.surface,
+      color: '#fff',
       marginBottom: 6,
     },
     cardLocationRow: {
@@ -553,7 +553,7 @@ const createStyles = (theme: AppTheme) =>
     cardCountryText: {
       fontSize: 13.5,
       fontWeight: "600",
-      color: theme.colors.surface,
+      color: '#fff',
       opacity: 0.9,
     },
     ratingRow: {
@@ -564,7 +564,7 @@ const createStyles = (theme: AppTheme) =>
     ratingText: {
       fontSize: 13,
       fontWeight: "700",
-      color: theme.colors.surface,
+      color: '#fff',
     },
     stateBox: {
       alignItems: "center",

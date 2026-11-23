@@ -256,6 +256,8 @@ export function getFlagUrl(countryCode: string): string {
 }
 
 //Wikipedia REST API func
+const WIKIPEDIA_GEOSEARCH_URL = "https://en.wikipedia.org/w/api.php";
+
 async function fetchWikipediaSummary(slug: string): Promise<{
   extract?: string;
   imageUrl?: string;
@@ -282,6 +284,40 @@ async function fetchWikipediaSummary(slug: string): Promise<{
   }
 }
 
+export async function fetchNearbyHighlights(
+  latitude: number,
+  longitude: number,
+  excludeCityName?: string,
+): Promise<Highlight[]> {
+  try {
+    const url = `${WIKIPEDIA_GEOSEARCH_URL}?action=query&generator=geosearch&ggscoord=${latitude}|${longitude}&ggsradius=10000&ggslimit=10&prop=pageimages&piprop=thumbnail&pithumbsize=400&format=json&origin=*`;
+
+    const response = await fetch(url, { headers: WIKI_HEADERS });
+    if (!response.ok) return [];
+
+    const data = await response.json();
+    const pagesObj = data.query?.pages;
+    if (!pagesObj) return [];
+
+    const pages: any[] = Object.values(pagesObj);
+
+    return pages
+      .filter(
+        (page) =>
+          page.thumbnail?.source &&
+          page.title?.toLowerCase() !== excludeCityName?.trim().toLowerCase(),
+      )
+      .slice(0, 5)
+      .map((page) => ({
+        id: String(page.pageid),
+        title: page.title,
+        imageUrl: page.thumbnail.source,
+      }));
+  } catch {
+    return [];
+  }
+}
+
 // Open-Meteo Live Weather func
 export async function fetchDestinationWeather(
   latitude: number,
@@ -305,72 +341,6 @@ export async function fetchDestinationWeather(
     return undefined;
   }
 }
-
-// Combine all data(s) from APIs, return complete destination
-// async function buildUserReadyDestination(
-//   baseDestination: BaseDestination,
-// ): Promise<Destination> {
-//   const [wiki, weather, highlightSummaries] = await Promise.all([
-//     fetchWikipediaSummary(baseDestination.wikiSlug),
-//     fetchDestinationWeather(
-//       baseDestination.latitude,
-//       baseDestination.longitude,
-//     ),
-//     Promise.all(
-//       baseDestination.highlights.map((h) => fetchWikipediaSummary(h.wikiSlug)),
-//     ),
-//   ]);
-
-//   const highlights: Highlight[] = baseDestination.highlights.map(
-//     (h, index) => ({
-//       id: h.id,
-//       title: h.title,
-//       imageUrl: highlightSummaries[index]?.imageUrl ?? h.fallbackImage,
-//     }),
-//   );
-
-//   return {
-//     id: baseDestination.id,
-//     name: baseDestination.name,
-//     country: baseDestination.country,
-//     countryCode: baseDestination.countryCode,
-//     flagUrl: getFlagUrl(baseDestination.countryCode),
-//     category: baseDestination.category,
-//     rating: baseDestination.rating,
-//     reviewsCount: baseDestination.reviewsCount,
-//     description: wiki.extract ?? baseDestination.fallbackDescription,
-//     imageUrl: wiki.imageUrl ?? baseDestination.fallbackImage,
-//     latitude: wiki.latitude ?? baseDestination.latitude,
-//     longitude: wiki.longitude ?? baseDestination.longitude,
-//     highlights,
-//     weather,
-//   };
-// }
-
-// // 5. Fetch all Featured Destinations
-// export async function fetchDestinations(): Promise<Destination[]> {
-//   return Promise.all(
-//     FEATURED_DEFAULT_DESTINATIONS.map(buildUserReadyDestination),
-//   );
-// }
-
-// // 6. Fetch single Destination by ID (or dynamic city name from search)
-// export async function fetchDestinationById(
-//   id: string,
-// ): Promise<Destination | null> {
-//   const seed = FEATURED_DEFAULT_DESTINATIONS.find(
-//     (item) => item.id.toLowerCase() === id.toLowerCase(),
-//   );
-//   if (seed) {
-//     return buildUserReadyDestination(seed);
-//   }
-
-//   // If user searched a custom city not in SEED_DESTINATIONS, resolve via Open-Meteo + Wikipedia!
-//   const searched = await searchCitiesRemote(id);
-//   return searched[0] ?? null;
-// }
-
-// 7. Live Worldwide City Search using Open-Meteo Geocoding API + Wikipedia + FlagCDN
 
 let alreadyFetchedDestinations: Destination[] | null = null;
 
@@ -439,58 +409,6 @@ export async function fetchDestinationById(
   return searched.find((item) => item.id === id) ?? searched[0] ?? null;
 }
 
-// export async function searchCitiesRemote(
-//   query: string,
-// ): Promise<Destination[]> {
-//   const trimmed = query.trim();
-//   if (trimmed.length < 2) return [];
-
-//   const url = `${GEOCODING_BASE_URL}?name=${encodeURIComponent(
-//     trimmed,
-//   )}&count=5&language=en&format=json`;
-
-//   const response = await fetch(url);
-//   if (!response.ok) {
-//     throw new Error("Failed to search cities");
-//   }
-
-//   const data = await response.json();
-//   const results: any[] = data.results ?? [];
-
-//   return Promise.all(
-//     results.map(async (item): Promise<Destination> => {
-//       const countryCode: string = item.country_code ?? "UN";
-//       const [wiki, weather] = await Promise.all([
-//         fetchWikipediaSummary(item.name),
-//         fetchDestinationWeather(item.latitude, item.longitude),
-//       ]);
-//       console.log(item);
-
-//       return {
-//         id: `${String(item.name).toLowerCase()}__${item.id}`, // e.g. "baku__1111"
-//         name: item.name,
-//         country: item.country ?? countryCode,
-//         countryCode,
-//         flagUrl: getFlagUrl(countryCode),
-//         category: "Cities",
-//         rating: undefined,
-//         reviewsCount: undefined,
-//         description:
-//           wiki.extract ??
-//           `Explore ${item.name}, a popular destination in ${
-//             item.country ?? ""
-//           }.`,
-//         imageUrl:
-//           wiki.imageUrl ??
-//           "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80",
-//         latitude: item.latitude,
-//         longitude: item.longitude,
-//         highlights: [],
-//         weather,
-//       };
-//     }),
-//   );
-// }
 export async function searchCitiesRemote(
   query: string,
 ): Promise<Destination[]> {
@@ -533,9 +451,10 @@ export async function searchCitiesRemote(
   const remoteDestinations = await Promise.all(
     uniqueRemoteItems.map(async (item): Promise<Destination> => {
       const countryCode: string = item.country_code ?? "UN";
-      const [wiki, weather] = await Promise.all([
+      const [wiki, weather, highlights] = await Promise.all([
         fetchWikipediaSummary(item.name),
         fetchDestinationWeather(item.latitude, item.longitude),
+        fetchNearbyHighlights(item.latitude, item.longitude, item.name),
       ]);
 
       return {
@@ -555,7 +474,7 @@ export async function searchCitiesRemote(
           "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80",
         latitude: item.latitude,
         longitude: item.longitude,
-        highlights: [],
+        highlights,
         weather,
       };
     }),

@@ -63,16 +63,6 @@ export default function DrawerLayout() {
           ),
         }}
       />
-      <Drawer.Screen
-        name="settings"
-        options={{
-          title: "Settings",
-          headerShown: true,
-          drawerIcon: ({ size }) => (
-            <Ionicons name="settings-outline" size={size} color={theme.colors.text} />
-          ),
-        }}
-      />
     </Drawer>
   );
 }

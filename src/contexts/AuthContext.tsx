@@ -8,7 +8,7 @@ import {
 import { storage } from "../services/storage";
 
 const DEMO_USER = {
-  email: "johnddoe@tripmate.app",
+  email: "johndoe@tripmate.app",
   password: "Password123!",
   name: "John",
   token: "tripmate-demo-jwt-token",
@@ -36,6 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (token) {
         setIsAuthenticated(true);
         setUserEmail(DEMO_USER.email);
+        setUserName(DEMO_USER.name);
       }
       setIsLoading(false);
     });
@@ -58,6 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await storage.deleteToken();
     setUserEmail(null);
     setIsAuthenticated(false);
+    setUserName(null);
   };
   return (
     <AuthContext.Provider

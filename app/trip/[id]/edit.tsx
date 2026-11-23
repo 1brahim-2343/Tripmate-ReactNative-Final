@@ -37,10 +37,9 @@ export default function EditTripScreen() {
   const [destinationText, setDestinationText] = useState<string>("");
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
-  const [travelers, setTravelers] = useState<number>(2);
   const [budgetInput, setBudgetInput] = useState<string>("0");
 
-  const [openRow, setOpenRow] = useState<"travelers" | "budget" | null>(null);
+  const [openRow, setOpenRow] = useState<"budget" | null>(null);
 
   const loadTrip = useCallback(async () => {
     if (!id) return;
@@ -259,52 +258,6 @@ export default function EditTripScreen() {
           </View>
 
           <View style={styles.rowsCard}>
-            <Pressable
-              onPress={() =>
-                setOpenRow(openRow === "travelers" ? null : "travelers")
-              }
-              style={styles.optionRow}
-            >
-              <View style={styles.rowLeft}>
-                <Ionicons
-                  name="people-outline"
-                  size={20}
-                  color={theme.colors.primary}
-                />
-                <Text style={styles.rowLabel}>Travelers</Text>
-              </View>
-              <View style={styles.rowRight}>
-                <Text style={styles.rowValue}>
-                  {travelers} {travelers === 1 ? "person" : "people"}
-                </Text>
-                <Ionicons
-                  name="chevron-forward"
-                  size={16}
-                  color={theme.colors.textSecondary}
-                />
-              </View>
-            </Pressable>
-
-            {openRow === "travelers" && (
-              <View style={styles.stepperRow}>
-                <Pressable
-                  onPress={() => setTravelers((prev) => Math.max(1, prev - 1))}
-                  style={styles.stepperBtn}
-                >
-                  <Ionicons name="remove" size={18} color={theme.colors.text} />
-                </Pressable>
-                <Text style={styles.stepperValue}>
-                  {travelers} {travelers === 1 ? "person" : "people"}
-                </Text>
-                <Pressable
-                  onPress={() => setTravelers((prev) => prev + 1)}
-                  style={styles.stepperBtn}
-                >
-                  <Ionicons name="add" size={18} color={theme.colors.text} />
-                </Pressable>
-              </View>
-            )}
-
             <View style={styles.rowDivider} />
 
             <Pressable
